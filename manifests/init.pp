@@ -43,6 +43,9 @@ class composer (
   Optional[String] $group   = undef,
   $download_timeout         = '0',
   Boolean $build_deps       = true,
+
+  Pattern[/^https?:\/\/.+(:[0-9]+)?$/, /^$/]  $http_proxy   = '',
+  Pattern[/^https?:\/\/.+(:[0-9]+)?$/, /^$/] $https_proxy = '',
 ) inherits ::composer::params {
 
   if $build_deps {
@@ -66,7 +69,7 @@ class composer (
   exec { 'composer-install':
     command     => "wget --no-check-certificate -O ${composer_full_path} ${target}",
     path        => '/usr/bin:/bin:/usr/local/bin:/usr/sbin:/sbin:/usr/local/sbin',
-    environment => [ "COMPOSER_HOME=${target_dir}" ],
+    environment => [ "COMPOSER_HOME=${target_dir}", "http_proxy=${http_proxy}", "https_proxy=${https_proxy}" ],
     user        => $user,
     unless      => $unless,
     timeout     => $download_timeout,
